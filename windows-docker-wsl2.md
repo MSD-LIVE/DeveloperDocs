@@ -2,47 +2,24 @@
 These instructions help Windows users install Docker inside a WSL2 VM, without using 
 Docker Desktop, which can be flaky when updating and has licensing fees.
 
-## Prerequisite:  Uninstall Docker Desitop
-If you have Docker Desktop currently installed, you will need to uninstall it first before
-following the rest of the steps.
+**Note:** If you already have Docker desktop installed you don't have to 
+uninstall but you also need to install docker on wsl2 container if you want to run docker commands in it. 
+
+## Step 0. Optional Terminal install 
+Install Windows Terminal application(https://learn.microsoft.com/en-us/windows/terminal/install) This provides a clean customizable interface to connect to the wsl2 container(s) installed.
 
 ## Step 1.  Install WSL2
-Open powershell as admin and run the following commands
+Open powershell as admin and run the following commands. 
+
 ```
-wsl --install -d Ubuntu
+wsl --install -d Ubuntu-24.04
 ```
-then once that completes:
+Once installation is complete run:
 ```
 sudo apt update
 ```
 
-Per those instructions, I installed the Ubuntu terminal, which is a very nice to running
-WSL through PowerShell.
-
-## Step 2.  Fix your DNS settings in your WSL2 VM
-By default, the VM will not have the correct name server configured, so you won't be able
-to access any URLs until you fix this (i.e., you can't install anything in your VM yet).
-
-Open a WSL2 terminal, and run this:
-
-```
-  echo -e "[network]\ngenerateResolvConf = false" | sudo tee -a /etc/wsl.conf
-  sudo unlink /etc/resolv.conf
-  echo nameserver 8.8.8.8 | sudo tee /etc/resolv.conf
-
-  # If you are on the PNNL network, then use 130.20.248.22 instead of 8.8.8.8
-```
-
-This creates a file called /etc/wsl.conf and writes the echoed lines to it. It also removes the special settings
- on /etc/resolv.conf and sets a specific DNS for the network.
-
-Restart WSL to make sure the DNS changes took effect:
-* From a PowerShell terminal, run `wsl --shutdown`
-* Open a new WSL terminal (from a PowerShell terminal, run `wsl`)
-* From your WSL terminal, run `ping www.google.com`.  If you get a response, all is well.
-
-
-## Step 3.  Install Docker in WSL2 VM
+## Step 2.  Install Docker in WSL2 VM
 From a WSL terminal, run these commands.
 
 1. Install Docker:
@@ -62,20 +39,10 @@ From a WSL terminal, run these commands.
     docker compose version
     ```
 
-4. Fix your IP Tables
-
-    If your WSL is using Ubuntu 22.04 or Debian 10+, you need to do 1 extra step for iptables
-compatibility.
-Choose option (1) to use iptables-legacy
-
-    ```
-    sudo update-alternatives --config iptables
-    ```
-
-    To figure out what version of Linux is running in WSL run this:
-    ```
-    cat /etc/os-release
-    ```
+4. If you have docker desktop installed on your machine, move the default docker config so that docker auth from within wsl2 container does not try to use docker desktop's exe.
+   ```
+   mv ~/.docker/config ~/.docker/config_backup
+   ```
 
 6. Set your Docker daemon to run on starup
 
