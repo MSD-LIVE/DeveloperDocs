@@ -19,6 +19,27 @@ Once installation is complete run:
 sudo apt update
 ```
 
+### Optional steps for older Ubuntu versions. Not needed for Ubuntu-24.04
+
+    By default, the VM will not have the correct name server configured, so you won't be able
+    to access any URLs until you fix this (i.e., you can't install anything in your VM yet).
+    
+    Open a WSL2 terminal, and run this:
+    
+          echo -e "[network]\ngenerateResolvConf = false" | sudo tee -a /etc/wsl.conf
+          sudo unlink /etc/resolv.conf
+          echo nameserver 8.8.8.8 | sudo tee /etc/resolv.conf
+        
+          # If you are on the PNNL network, then use 130.20.248.22 instead of 8.8.8.8
+    
+    This creates a file called /etc/wsl.conf and writes the echoed lines to it. It also removes the special settings
+     on /etc/resolv.conf and sets a specific DNS for the network.
+
+    Restart WSL to make sure the DNS changes took effect:
+    * From a PowerShell terminal, run `wsl --shutdown`
+    * Open a new WSL terminal (from a PowerShell terminal, run `wsl`)
+    * From your WSL terminal, run `ping www.google.com`.  If you get a response, all is well.
+
 ## Step 2.  Install Docker in WSL2 VM
 From a WSL terminal, run these commands.
 
